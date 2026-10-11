@@ -10,6 +10,7 @@ const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Configure CORS to accept configured FRONTEND_URL and local dev origins
 const frontendUrls = (process.env.FRONTEND_URL || '')

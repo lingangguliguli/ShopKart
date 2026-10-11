@@ -29,6 +29,16 @@ const register = async (req, res) => {
       phone
     });
 
+    const token = generateToken(newCustomer._id);
+    const expireDays = Number(process.env.COOKIE_EXPIRE) || 7;
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: expireDays * 24 * 60 * 60 * 1000
+    };
+    res.cookie('token', token, cookieOptions);
+
     res.status(201).json({
       success: true,
       message: 'Customer registered successfully',
@@ -60,11 +70,14 @@ const login = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    const expireDays = process.env.COOKIE_EXPIRE || 7;
-    res.cookie('token', token, {
+    const expireDays = Number(process.env.COOKIE_EXPIRE) || 7;
+    const cookieOptions = {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: expireDays * 24 * 60 * 60 * 1000
-    });
+    };
+    res.cookie('token', token, cookieOptions);
 
     res.status(200).json({
       success: true,
@@ -88,7 +101,14 @@ const getMe = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie('token');
+    const expireDays = Number(process.env.COOKIE_EXPIRE) || 7;
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: expireDays * 24 * 60 * 60 * 1000
+    };
+    res.clearCookie('token', cookieOptions);
     res.status(200).json({
       success: true,
       message: 'Logged out successfully'
